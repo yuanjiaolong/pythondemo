@@ -14,21 +14,31 @@ email_re = re.compile(r'([\w\.,]+@[\w\.,]+\.\w+)')
 link_re = re.compile(r'href="(.*?)"')
 http_re = re.compile(r'^http(.*?)')
 
-urlList = ['http://www.sina.com','http://www.sohu.com']
+urlList = ['http://www.duowan.com','http://www.17173.com']
 
 mailsdb = []
 
 def crawl(url):
-
-    req = requests.get(url)
-    links = link_re.findall(req.text)
-    mails = email_re.findall(req.text)
-    if len(mails) > 0:
-        mailsdb.extend(mails)
-    for link in links:
-        m = re.match(r'^http(.*?)', link)
-        if m:
-            urlList.append(link)
+    try:
+        req = requests.get(url)
+        file = open('mail.txt', mode='a')
+        links = link_re.findall(req.text)
+        mails = email_re.findall(req.text)
+        if len(mails) > 0:
+            mailsdb.extend(mails)
+            
+        for mail in mailsdb:
+            file.write(mail+"\n")
+            mailsdb.remove(mail)
+        
+        for link in links:
+            m = re.match(r'^http(.*?)', link)
+            if m:
+                urlList.append(link)
+    except:
+        raise ValueError("kao")
+    finally:
+        file.close()
     return req.content
 
 
@@ -40,7 +50,7 @@ if __name__ == '__main__':
        content = crawl(url)
        count+=1
        print(url)
-       if count > 10:
+       if count > 1000:
            break
     
     print(count)
