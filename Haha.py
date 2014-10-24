@@ -14,13 +14,16 @@ email_re = re.compile(r'([\w\.,]+@[\w\.,]+\.\w+)')
 link_re = re.compile(r'href="(.*?)"')
 http_re = re.compile(r'^http(.*?)')
 
-urlList = ['http://www.duowan.com','http://www.17173.com']
+urlList = ['http://www.duowan.com','http://www.17173.com','http://tieba.baidu.com/']
 
 mailsdb = []
+urlDB = []
 
 def crawl(url):
     try:
         req = requests.get(url)
+        if req.status_code != 200:
+            return 
         file = open('mail.txt', mode='a')
         links = link_re.findall(req.text)
         mails = email_re.findall(req.text)
@@ -34,7 +37,9 @@ def crawl(url):
         for link in links:
             m = re.match(r'^http(.*?)', link)
             if m:
-                urlList.append(link)
+                if link not in urlDB:
+                    urlList.append(link)
+                    urlDB.append(link)
     except:
         raise ValueError("kao")
     finally:
@@ -44,13 +49,13 @@ def crawl(url):
 
 
 if __name__ == '__main__':
-    count = 0
+    countnum = 0
     while len(urlList) >= 1:
        url = urlList.pop()
-       content = crawl(url)
-       count+=1
+       crawl(url)
+       countnum+=1
        print(url)
-       if count > 1000:
+       if countnum > 1000:
            break
     
     print(count)
