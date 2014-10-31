@@ -9,22 +9,24 @@ import re
 from urllib import parse
 from itertools import count
 
-email_re = re.compile(r'([\w\.,]+@[\w\.,]+\.\w+)')
+#email_re = re.compile(r'([\w\.,]+@[\w\.,]+\.\w+)')
+email_re = re.compile(r'([\w\.,]+@(gmail\.com|qq\.com|msn\.com|126\.com|163\.com))')
 
 link_re = re.compile(r'href="(.*?)"')
 http_re = re.compile(r'^http(.*?)')
 
-urlList = ['http://www.duowan.com','http://www.17173.com','http://tieba.baidu.com/']
+urlList = ['http://www.duowan.com','http://www.17173.com','http://tieba.baidu.com/','http://www.csdn.net','http://coolshell.cn']
 
 mailsdb = []
 urlDB = []
 
 def crawl(url):
     try:
+        file = open('mail.txt', mode='a')
         req = requests.get(url)
         if req.status_code != 200:
             return 
-        file = open('mail.txt', mode='a')
+       
         links = link_re.findall(req.text)
         mails = email_re.findall(req.text)
         if len(mails) > 0:
@@ -40,11 +42,12 @@ def crawl(url):
                 if link not in urlDB:
                     urlList.append(link)
                     urlDB.append(link)
+        file.close()
     except:
-        raise ValueError("kao")
+        pass
     finally:
         file.close()
-    return req.content
+   
 
 
 
@@ -52,6 +55,7 @@ if __name__ == '__main__':
     countnum = 0
     while len(urlList) >= 1:
        url = urlList.pop()
+       print(len(urlList))
        crawl(url)
        countnum+=1
        print(url)
